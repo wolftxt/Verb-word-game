@@ -44,7 +44,7 @@ public class VerbsService {
     }
 
     public GameState guessVerb(PlayerVerb guess) {
-        String verb = guess.getGuess().trim().toLowerCase();
+        String verb = guess.getGuess().replace(' ', '_').trim().toLowerCase();
         GameState game = games.get(guess.getGameId());
         if (game == null) {
             throw new GameNotFoundException("Game with id: " + guess.getGameId() + " was not found");
@@ -52,10 +52,16 @@ public class VerbsService {
         if (game.getUsedVerbs().contains(verb)) {
             throw new IllegalArgumentException("Verb: " + verb + " has already been guessed");
         }
-
+        if (!game.isPlaying()) {
+            throw new IllegalArgumentException("Game with id: " + guess.getGameId() + " is not in playing state");
+        }
+        game.setPlaying(false);
         String databaseKey = game.getWord() + "_" + verb;
         Optional<StoreLlmOutput> dbOutput = repository.findById(databaseKey);
         if (dbOutput.isPresent()) {
+            StoreLlmOutput output = dbOutput.get();
+            output.setPromptCount(output.getPromptCount() + 1);
+            repository.save(output);
             applyLlmOutputToGame(dbOutput.get(), game);
             return game;
         }
@@ -106,11 +112,11 @@ public class VerbsService {
         Boolean survived = Boolean.valueOf(lines[0]);
         String response = lines[1];
         if (!survived) {
-            return new StoreLlmOutput(input, response, null, null, survived);
+            return new StoreLlmOutput(input, response, null, null, 1L, survived);
         }
         String word = lines[2];
         String emojis = lines[3];
-        return new StoreLlmOutput(input, response, word, emojis, survived);
+        return new StoreLlmOutput(input, response, word, emojis, 1L, survived);
     }
 
 }

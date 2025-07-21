@@ -22,5 +22,6 @@ public class StoreLlmOutput {
     private String outputWord;
     @Column(length = 255)
     private String outputEmojis;
+    private Long promptCount;
     private Boolean survived;
 }
