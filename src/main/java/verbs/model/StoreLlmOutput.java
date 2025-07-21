@@ -16,5 +16,11 @@ public class StoreLlmOutput {
     @Id
     @Column(length = 255)
     private String inputWords;
+    @Column(length = 1023)
+    private String llmOutput;
+    @Column(length = 255)
     private String outputWord;
+    @Column(length = 255)
+    private String outputEmojis;
+    private Boolean survived;
 }

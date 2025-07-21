@@ -23,7 +23,7 @@ public class GeminiApiClient {
                 .build();
     }
 
-    public String promptGemini(String prompt, String model) throws Exception {
+    public String promptGemini(String prompt, String model) {
         Content content = Content.fromParts(Part.fromText(prompt));
         GenerateContentResponse response = geminiClient.models.generateContent(model, content, null);
         return response.text();
