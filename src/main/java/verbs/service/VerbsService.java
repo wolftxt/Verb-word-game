@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import verbs.controller.GameNotFoundException;
 import verbs.controller.GameState;
 import verbs.controller.PlayerVerb;
 import verbs.model.StoreLlmOutput;
@@ -55,6 +56,9 @@ public class VerbsService {
     public GameState guessVerb(PlayerVerb guess) {
         String verb = guess.getGuess().trim().toLowerCase();
         GameState game = games.get(guess.getGameId());
+        if (game == null) {
+            throw new GameNotFoundException("Game with id: " + guess.getGameId() + " was not found");
+        }
         if (game.getUsedVerbs().contains(verb)) {
             throw new IllegalArgumentException("Verb: " + verb + " has already been guessed");
         }
@@ -104,26 +108,17 @@ public class VerbsService {
                 .append("User's verb: ").append(verb);
 
         String output = geminiClient.promptGemini(prompt.toString(), "gemini-2.5-flash");
-        System.out.println(output);
 
         String input = game.getWord() + '_' + verb;
-        int newLineIndex = output.indexOf('\n');
 
-        Boolean survived = Boolean.valueOf(output.substring(0, newLineIndex));
-        output = output.substring(newLineIndex + 1);
-
+        String[] lines = output.split("\\n+");
+        Boolean survived = Boolean.valueOf(lines[0]);
+        String response = lines[1];
         if (!survived) {
-            String response = output.trim().toLowerCase();
             return new StoreLlmOutput(input, response, null, null, survived);
         }
-        String emojis = EmojiParser.extractEmojis(output).stream().collect(Collectors.joining());
-        output = EmojiParser.removeAllEmojis(output);
-
-        String[] words = output.trim().split(output);
-        String word = words[words.length - 1];
-        output = output.trim().substring(0, output.length() - word.length());
-
-        String response = output.trim().toLowerCase();
+        String word = lines[2];
+        String emojis = lines[3];
         return new StoreLlmOutput(input, response, word, emojis, survived);
     }
 
