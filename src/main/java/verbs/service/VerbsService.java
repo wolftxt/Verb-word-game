@@ -1,8 +1,6 @@
 package verbs.service;
 
-import com.vdurmont.emoji.EmojiParser;
 import java.util.*;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import verbs.controller.GameNotFoundException;
@@ -39,15 +37,7 @@ public class VerbsService {
         usedWords.add(initialWord);
         List<String> usedVerbs = new ArrayList();
 
-        GameState newGame = new GameState();
-        newGame.setGameId(gameId);
-        newGame.setLlmOutput(null);
-        newGame.setWord(initialWord);
-        newGame.setEmojis(initialEmojis);
-        newGame.setUsedWords(usedWords);
-        newGame.setUsedVerbs(usedVerbs);
-        newGame.setScore(0);
-        newGame.setPlaying(true);
+        GameState newGame = new GameState(gameId, "", initialWord, initialEmojis, usedWords, usedVerbs, 0, true);
 
         games.put(gameId, newGame);
         return newGame;
@@ -87,7 +77,8 @@ public class VerbsService {
         game.setLlmOutput(llmOutput.getLlmOutput());
         game.setWord(llmOutput.getOutputWord());
         game.setEmojis(llmOutput.getOutputEmojis());
-        game.setPlaying(llmOutput.getSurvived().booleanValue());
+        game.getUsedWords().add(llmOutput.getOutputWord());
+        game.setPlaying(llmOutput.getSurvived());
         if (!game.isPlaying()) {
             games.remove(game.getGameId());
         } else {
