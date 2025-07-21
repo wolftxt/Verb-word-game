@@ -17,15 +17,15 @@ public class VerbsController {
     }
 
     @GetMapping("/newGame")
-    public ResponseEntity<GameStateResponse> getNewGame() {
-        GameStateResponse game = service.newGame();
+    public ResponseEntity<GameState> getNewGame() {
+        GameState game = service.newGame();
         return ResponseEntity.ok(game);
     }
 
     @PostMapping("/play")
-    public ResponseEntity<GameStateResponse> guessVerb(@RequestBody PlayerVerb guess) {
+    public ResponseEntity<GameState> guessVerb(@RequestBody PlayerVerb guess) {
         try {
-            GameStateResponse response = service.guessVerb(guess);
+            GameState response = service.guessVerb(guess);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();

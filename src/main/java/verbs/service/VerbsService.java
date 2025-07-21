@@ -1,19 +1,130 @@
 package verbs.service;
 
-import verbs.controller.GameStateResponse;
+import com.vdurmont.emoji.EmojiParser;
+import java.util.*;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import verbs.controller.GameState;
 import verbs.controller.PlayerVerb;
+import verbs.model.StoreLlmOutput;
+import verbs.repository.LlmOutputRepository;
 
+@Service
 public class VerbsService {
     
-    public GameStateResponse newGame() {
-        
+    private static final String initialWord = "Rabbit";
+    private static final String initialEmojis = "🐰";
+    
+    private final String initialPrompt;
+    
+    private final LlmOutputRepository repository;
+    private final GeminiApiClient geminiClient;
+    
+    private final Map<String, GameState> games = new HashMap();
+    
+    @Autowired
+    public VerbsService(LlmOutputRepository repository, GeminiApiClient geminiClient) {
+        this.repository = repository;
+        this.geminiClient = geminiClient;
+        Scanner sc = new Scanner(VerbsService.class.getResourceAsStream("/static/prompt.txt"));
+        sc.useDelimiter("\\A");
+        initialPrompt = sc.next();
     }
     
-    public GameStateResponse guessVerb(PlayerVerb guess) {
+    public GameState newGame() {
+        String gameId = UUID.randomUUID().toString();
+        List<String> usedWords = new ArrayList();
+        usedWords.add(initialWord);
+        List<String> usedVerbs = new ArrayList();
         
+        GameState newGame = new GameState();
+        newGame.setGameId(gameId);
+        newGame.setLlmOutput(null);
+        newGame.setWord(initialWord);
+        newGame.setEmojis(initialEmojis);
+        newGame.setUsedWords(usedWords);
+        newGame.setUsedVerbs(usedVerbs);
+        newGame.setScore(0);
+        newGame.setPlaying(true);
+        
+        games.put(gameId, newGame);
+        return newGame;
+    }
+    
+    public GameState guessVerb(PlayerVerb guess) {
+        String verb = guess.getGuess().trim().toLowerCase();
+        GameState game = games.get(guess.getGameId());
+        if (game.getUsedVerbs().contains(verb)) {
+            throw new IllegalArgumentException("Verb: " + verb + " has already been guessed");
+        }
+        
+        String databaseKey = game.getWord() + "_" + verb;
+        Optional<StoreLlmOutput> dbOutput = repository.findById(databaseKey);
+        if (dbOutput.isPresent()) {
+            applyLlmOutputToGame(dbOutput.get(), game);
+            return game;
+        }
+        StoreLlmOutput output = promptLlm(game, guess.getGuess());
+        applyLlmOutputToGame(output, game);
+        repository.save(output);
+        return game;
     }
     
     public boolean deleteGame(String gameId) {
-        
+        if (games.containsKey(gameId)) {
+            games.remove(gameId);
+            return true;
+        }
+        return false;
     }
+    
+    private void applyLlmOutputToGame(StoreLlmOutput llmOutput, GameState game) {
+        game.setLlmOutput(llmOutput.getLlmOutput());
+        game.setWord(llmOutput.getOutputWord());
+        game.setEmojis(llmOutput.getOutputEmojis());
+        game.setPlaying(llmOutput.getSurvived().booleanValue());
+        if (!game.isPlaying()) {
+            games.remove(game.getGameId());
+        } else {
+            game.setScore(game.getScore() + 1);
+        }
+    }
+    
+    private StoreLlmOutput promptLlm(GameState game, String verb) {
+        StringBuilder prompt = new StringBuilder(initialPrompt);
+        List<String> usedWords = game.getUsedWords();
+        for (int i = 0; i < usedWords.size() - 1; i++) {
+            prompt.append(usedWords.get(i));
+            prompt.append(", ");
+        }
+        prompt.append(usedWords.getLast()).append('\n')
+                .append("Input:").append('\n')
+                .append("Original word: ").append(game.getWord()).append('\n')
+                .append("User's verb: ").append(verb);
+        
+        String output = geminiClient.promptGemini(prompt.toString(), "gemini-2.5-flash");
+        
+        String input = game.getWord() + '_' + verb;
+        int lastNewLine = output.lastIndexOf('\n');
+        
+        Boolean survived = Boolean.parseBoolean(output.substring(lastNewLine) + 1);
+        output = output.substring(0, lastNewLine);
+        lastNewLine = output.lastIndexOf('\n');
+        
+        if (!survived) {
+            String response = output.trim().toLowerCase();
+            return new StoreLlmOutput(input, response, null, null, survived);
+        }
+        
+        String word = output.substring(lastNewLine + 1).trim().toLowerCase();
+        output = output.substring(0, lastNewLine);
+        
+        String emojis = EmojiParser.extractEmojis(output).stream().collect(Collectors.joining());
+        output = EmojiParser.removeAllEmojis(output);
+        
+        String response = output.trim().toLowerCase();
+        return new StoreLlmOutput(input, response, word, emojis, survived);
+    }
+    
 }
