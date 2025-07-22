@@ -37,7 +37,7 @@ public class VerbsService {
         usedWords.add(initialWord);
         List<String> usedVerbs = new ArrayList();
 
-        GameState newGame = new GameState(gameId, "", initialWord, initialEmojis, usedWords, usedVerbs, 0, true);
+        GameState newGame = new GameState(gameId, "", 0, initialWord, initialEmojis, usedWords, usedVerbs, 0, true);
 
         games.put(gameId, newGame);
         return newGame;
@@ -56,6 +56,7 @@ public class VerbsService {
             throw new IllegalArgumentException("Game with id: " + guess.getGameId() + " is not in playing state");
         }
         game.setPlaying(false);
+        game.getUsedVerbs().add(verb);
         String databaseKey = game.getWord() + "_" + verb;
         Optional<StoreLlmOutput> dbOutput = repository.findById(databaseKey);
         if (dbOutput.isPresent()) {
@@ -81,6 +82,7 @@ public class VerbsService {
 
     private void applyLlmOutputToGame(StoreLlmOutput llmOutput, GameState game) {
         game.setLlmOutput(llmOutput.getLlmOutput());
+        game.setPromptCount(llmOutput.getPromptCount());
         game.setWord(llmOutput.getOutputWord());
         game.setEmojis(llmOutput.getOutputEmojis());
         game.getUsedWords().add(llmOutput.getOutputWord());

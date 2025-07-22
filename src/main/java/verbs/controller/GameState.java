@@ -12,6 +12,7 @@ public class GameState {
 
     private String gameId;
     private String llmOutput;
+    private long promptCount;
     private String word;
     private String emojis;
     private List<String> usedWords;
