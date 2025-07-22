@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>What does ___ do? Game</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="container">
+            <h1>What does <span id="current-word">___</span> do?</h1>
+            <div id="emojis"></div>
+            <div id="witty-response"></div>
+            <div id="score"></div>
+            <div id="counter"></div>
+            <form id="guess-form">
+                <input
+                    type="text"
+                    id="verb-input"
+                    placeholder="Enter a verb..."
+                    required
+                    autocomplete="off"
+                />
+                <button type="submit">Submit</button>
+            </form>
+            <button id="start-btn">Start New Game</button>
+            <div id="game-over" class="hidden">
+                Game Over! <button id="restart-btn">Restart</button>
+            </div>
+        </div>
+        <script src="app.js"></script>
+    </body>
+</html>
