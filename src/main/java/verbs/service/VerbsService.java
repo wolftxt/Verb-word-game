@@ -45,6 +45,9 @@ public class VerbsService {
 
     public GameState guessVerb(PlayerVerb guess) {
         String verb = guess.getGuess().replace(' ', '_').trim().toLowerCase();
+        if (verb.length() > StoreLlmOutput.inputLimit) {
+            throw new IllegalArgumentException("Input is longer than the maximum length of " + StoreLlmOutput.inputLimit);
+        }
         GameState game = games.get(guess.getGameId());
         if (game == null) {
             throw new GameNotFoundException("Game with id: " + guess.getGameId() + " was not found");
@@ -107,17 +110,26 @@ public class VerbsService {
                 .append("User's verb: ").append(verb);
 
         String output = geminiClient.promptGemini(prompt.toString(), "gemini-2.5-flash");
-
+        System.out.println(output);
         String input = game.getWord() + '_' + verb;
 
         String[] lines = output.split("\\n+");
         Boolean survived = Boolean.valueOf(lines[0]);
         String response = lines[1];
+        if (response.length() > StoreLlmOutput.outputLimit) {
+            response = response.substring(0, StoreLlmOutput.outputLimit);
+        }
         if (!survived) {
             return new StoreLlmOutput(input, response, null, null, 1L, survived);
         }
         String word = lines[2];
         String emojis = lines[3];
+        if (word.length() > StoreLlmOutput.outputWordLimit) {
+            word = word.substring(0, StoreLlmOutput.outputWordLimit);
+        }
+        if (emojis.length() > StoreLlmOutput.outputWordLimit) {
+            emojis = word.substring(0, StoreLlmOutput.outputWordLimit);
+        }
         return new StoreLlmOutput(input, response, word, emojis, 1L, survived);
     }
 

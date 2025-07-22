@@ -6,18 +6,20 @@ WITTY_RESPONSE
 NEW_WORD (Only if SENSE_CHECK is True, otherwise leave blank)
 EMOJI (One or more emojis, only if SENSE_CHECK is True, otherwise leave blank)
 
-Here's an example of the desired output when it makes sense:
+Here's an example of the desired output when it makes sense or is funny:
 True
 That's a great jump for a bunny! Now let's see what a swift one can do.
 Cheetah
 🐆💨
 
-Here's an example of the desired output when it doesn't make sense (game over):
+Here's an example of the desired output when it doesn't make sense and isn't funny (game over):
 False
-Did that bunny just try to... lie down? I'm not sure that's how bunnies work. Game over!
+Did that bunny just try to... lie down? I'm not sure that's how bunnies work.
 
 Rules to follow:
-- **SENSE_CHECK** must be either "True" or "False".
+- **SENSE_CHECK** must be either "True" or "False". 
+- **SENSE_CHECK** should be true if the user tries to make a joke like Kangaroos fighting australians. 
+- **SENSE CHECK** should be false if the user's verb does not make sense and is not funny.
 - If **SENSE_CHECK** is "True**, your **WITTY_RESPONSE** should be clever and naturally transition to the new word. You must also include a **NEW_WORD** and one or more **EMOJI** characters.
 - If **SENSE_CHECK** is "False**, your **WITTY_RESPONSE** should humorously point out the illogical verb and indicate the game is over. The **NEW_WORD** and **EMOJI** lines must be blank.
 - The **NEW_WORD** should be a single noun.

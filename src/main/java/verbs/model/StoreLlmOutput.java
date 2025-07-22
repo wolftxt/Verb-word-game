@@ -13,15 +13,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StoreLlmOutput {
 
+    public static final int inputLimit = 256;
+    public static final int outputWordLimit = 64;
+    public static final int outputLimit = 1024;
+
     @Id
-    @Column(length = 255)
+    @Column(length = inputLimit)
     private String inputWords;
-    @Column(length = 1023)
+    
+    @Column(length = outputLimit)
     private String llmOutput;
-    @Column(length = 255)
+    
+    @Column(length = outputWordLimit)
     private String outputWord;
-    @Column(length = 255)
+    
+    @Column(length = outputWordLimit)
     private String outputEmojis;
+    
     private Long promptCount;
     private Boolean survived;
 }
