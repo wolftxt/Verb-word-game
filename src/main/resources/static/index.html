@@ -1,33 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>What does ___ do? Game</title>
-        <link rel="stylesheet" href="style.css" />
-    </head>
-    <body>
-        <div class="container">
-            <h1>What does <span id="current-word">___</span> do?</h1>
-            <div id="emojis"></div>
-            <div id="witty-response"></div>
-            <div id="score"></div>
-            <div id="counter"></div>
-            <form id="guess-form">
-                <input
-                    type="text"
-                    id="verb-input"
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What does a ___ do?</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Tutorial Overlay -->
+    <div id="tutorial-overlay" class="tutorial-overlay">
+        <div class="tutorial-content">
+            <h2>Welcome to "What does a ___ do?"</h2>
+            <div class="tutorial-animation">
+                <div class="tutorial-word">Rabbit</div>
+                <div class="tutorial-arrow">→</div>
+                <div class="tutorial-verb"></div>
+            </div>
+            <p>Think of a verb that describes what the given noun does!</p>
+            <p>The AI will respond with a creative story and give you a new word.</p>
+            <p>Try to keep the chain going as long as possible!</p>
+            <button id="start-game-btn" class="start-btn">Start Playing</button>
+        </div>
+    </div>
+
+    <!-- Main Game Container -->
+    <div class="container">
+        <!-- Animated Title -->
+        <h1 class="animated-title">
+            What does a <span id="title-word" class="title-word"></span> do?
+        </h1>
+
+        <!-- Game Area -->
+        <div id="game-area" class="game-area hidden">
+            <!-- Current Word Display -->
+            <div class="current-word-container">
+                <div class="emoji-display" id="emoji-display">🐰</div>
+                <div class="word-display" id="word-display">Rabbit</div>
+            </div>
+
+            <!-- Input Section -->
+            <div class="input-section">
+                <input 
+                    type="text" 
+                    id="verb-input" 
+                    class="verb-input" 
                     placeholder="Enter a verb..."
-                    required
-                    autocomplete="off"
-                />
-                <button type="submit">Submit</button>
-            </form>
-            <button id="start-btn">Start New Game</button>
-            <div id="game-over" class="hidden">
-                Game Over! <button id="restart-btn">Restart</button>
+                    maxlength="50"
+                >
+                <button id="submit-btn" class="submit-btn">Submit</button>
+            </div>
+
+            <!-- Response Section -->
+            <div id="response-section" class="response-section hidden">
+                <div class="prompt-count" id="prompt-count"></div>
+                <div class="llm-response" id="llm-response"></div>
+            </div>
+
+            <!-- Score Display -->
+            <div class="score-display">
+                Score: <span id="score">0</span>
+            </div>
+
+            <!-- Used Words/Verbs Display -->
+            <div class="used-items-container">
+                <div class="used-section">
+                    <h3>Used Words</h3>
+                    <div id="used-words" class="used-list"></div>
+                </div>
+                <div class="used-section">
+                    <h3>Used Verbs</h3>
+                    <div id="used-verbs" class="used-list"></div>
+                </div>
             </div>
         </div>
-        <script src="app.js"></script>
-    </body>
+
+        <!-- Game Over Screen -->
+        <div id="game-over" class="game-over hidden">
+            <h2>Game Over!</h2>
+            <p>Final Score: <span id="final-score">0</span></p>
+            <div id="game-over-message"></div>
+            <button id="new-game-btn" class="new-game-btn">New Game</button>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="animations.js"></script>
+    <script src="game.js"></script>
+</body>
 </html>
