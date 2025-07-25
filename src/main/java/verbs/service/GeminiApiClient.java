@@ -4,6 +4,8 @@ import com.google.genai.Client;
 import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.HttpOptions;
+import com.google.genai.types.ListModelsResponse;
+import com.google.genai.types.Model;
 import com.google.genai.types.Part;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +21,7 @@ public class GeminiApiClient {
     @PostConstruct
     public void init() {
         geminiClient = Client.builder().apiKey(apiKey)
-                .httpOptions(HttpOptions.builder().apiVersion("v1").build())
+                .httpOptions(HttpOptions.builder().apiVersion("v1beta").build())
                 .build();
     }
 

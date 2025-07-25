@@ -108,8 +108,7 @@ public class VerbsService {
                 .append("Input:").append('\n')
                 .append("Original word: ").append(game.getWord()).append('\n')
                 .append("User's verb: ").append(verb);
-
-        String output = geminiClient.promptGemini(prompt.toString(), "gemini-2.5-flash");
+        String output = geminiClient.promptGemini(prompt.toString(), "gemini-2.5-flash-lite");
         System.out.println(output);
         String input = game.getWord() + '_' + verb;
 
