@@ -12,32 +12,41 @@ import verbs.repository.LlmOutputRepository;
 @Service
 public class VerbsService {
 
-    private static final String initialWord = "Rabbit";
     private static final String initialEmojis = "🐰";
 
     private final String initialPrompt;
 
     private final LlmOutputRepository repository;
     private final GeminiApiClient geminiClient;
+    private final LanguagesJsonParser parser;
 
     private final Map<String, GameState> games = new HashMap();
 
     @Autowired
-    public VerbsService(LlmOutputRepository repository, GeminiApiClient geminiClient) {
+    public VerbsService(LlmOutputRepository repository, GeminiApiClient geminiClient, LanguagesJsonParser parser) {
         this.repository = repository;
         this.geminiClient = geminiClient;
+        this.parser = parser;
         Scanner sc = new Scanner(VerbsService.class.getResourceAsStream("/static/prompt.txt"));
         sc.useDelimiter("\\A");
         initialPrompt = sc.next();
     }
 
-    public GameState newGame() {
+    public String[] getLanguageList() {
+        return (String[]) parser.getJson().keySet().toArray();
+    }
+
+    public GameState newGame(String language) {
         String gameId = UUID.randomUUID().toString();
+        String initialWord = (String) parser.getJson().get(language);
+        if (initialWord == null) {
+            throw new IllegalArgumentException("Language: " + language + " is not supported");
+        }
         List<String> usedWords = new ArrayList();
         usedWords.add(initialWord);
         List<String> usedVerbs = new ArrayList();
 
-        GameState newGame = new GameState(gameId, "", 0, initialWord, initialEmojis, usedWords, usedVerbs, 0, true);
+        GameState newGame = new GameState(gameId, language, "", 0, initialWord, initialEmojis, usedWords, usedVerbs, 0, true);
 
         games.put(gameId, newGame);
         return newGame;
@@ -107,7 +116,8 @@ public class VerbsService {
         prompt.append(usedWords.getLast()).append('\n')
                 .append("Input:").append('\n')
                 .append("Original word: ").append(game.getWord()).append('\n')
-                .append("User's verb: ").append(verb);
+                .append("User's verb: ").append(verb).append('\n')
+                .append("Output language: ").append(game.getLanguage());
         String output = geminiClient.promptGemini(prompt.toString(), "gemini-2.5-flash-lite");
         System.out.println(output);
         String input = game.getWord() + '_' + verb;

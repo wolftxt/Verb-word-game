@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class GameState {
 
     private String gameId;
+    private String language;
     private String llmOutput;
     private long promptCount;
     private String word;

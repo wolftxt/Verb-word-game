@@ -16,10 +16,15 @@ public class VerbsController {
         this.service = service;
     }
 
+    @GetMapping("/supportedLanguages")
+    public ResponseEntity<String[]> getSupportedLanguages() {
+        return ResponseEntity.ok(service.getLanguageList());
+    }
+
     @GetMapping("/newGame")
-    public ResponseEntity<GameState> getNewGame() {
-        GameState game = service.newGame();
-        return ResponseEntity.ok(game);
+    public ResponseEntity<GameState> getNewGame(@PathVariable String language) {
+        GameState game = service.newGame(language);
+        return game == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(game);
     }
 
     @PostMapping("/play")
