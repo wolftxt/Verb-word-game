@@ -7,6 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Used to cache llm responses and count how many times this exact word verb
+ * combination has been used.
+ *
+ * @author davidwolf
+ */
 @Entity
 @Data
 @NoArgsConstructor
@@ -20,16 +26,16 @@ public class StoreLlmOutput {
     @Id
     @Column(length = inputLimit)
     private String inputWords;
-    
+
     @Column(length = outputLimit)
     private String llmOutput;
-    
+
     @Column(length = outputWordLimit)
     private String outputWord;
-    
+
     @Column(length = outputWordLimit)
     private String outputEmojis;
-    
+
     private Long promptCount;
     private Boolean survived;
 }

@@ -8,6 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+/**
+ * Loads and parses the JSON from languages.json into a Map<String, Object>
+ *
+ * @author davidwolf
+ */
 @Service
 public class LanguagesJsonParser {
 

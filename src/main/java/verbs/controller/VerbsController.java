@@ -5,6 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import verbs.service.VerbsService;
 
+/**
+ * Defines the api endpoints
+ *
+ * @author davidwolf
+ */
 @RestController
 @RequestMapping("/api/verbs")
 public class VerbsController {

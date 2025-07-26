@@ -5,6 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Class storing game state. Stored in a HashMap in VerbsService. This class is
+ * also converted to a JSON by Spring and sent to the client.
+ *
+ * @author davidwolf
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

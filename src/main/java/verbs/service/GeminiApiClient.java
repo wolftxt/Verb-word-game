@@ -9,6 +9,12 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+/**
+ * Provides an easy way to call the gemini api. Injects the api key from
+ * application.properties. Uses v1beta api version.
+ *
+ * @author davidwolf
+ */
 @Service
 public class GeminiApiClient {
 

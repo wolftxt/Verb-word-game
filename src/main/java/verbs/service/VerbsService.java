@@ -9,6 +9,11 @@ import verbs.controller.PlayerVerb;
 import verbs.model.StoreLlmOutput;
 import verbs.repository.LlmOutputRepository;
 
+/**
+ * Class used to manage state and handle most of the backend logic.
+ *
+ * @author davidwolf
+ */
 @Service
 public class VerbsService {
 
@@ -52,6 +57,19 @@ public class VerbsService {
         return newGame;
     }
 
+    /**
+     * Normalizes the verb. Uses the word verb combination from the database if
+     * it exists. If the word verb combination doesn't exist then it calls
+     * promptLlm() for a new one. Then it increments the prompt count for this
+     * word verb combination.
+     *
+     * @throws GameNotFoundException if PlayerVerb has an ID the server doesn't
+     * recognize
+     * @throws IllegalArgumentException if the verb has already been guessed or
+     * game is not in playing state
+     * @param guess
+     * @return
+     */
     public GameState guessVerb(PlayerVerb guess) {
         String verb = guess.getGuess().replace(' ', '_').trim().toLowerCase();
         if (verb.length() > StoreLlmOutput.inputLimit) {
@@ -106,6 +124,15 @@ public class VerbsService {
         }
     }
 
+    /**
+     * Prompts gemini with prompt.txt to which it appends Input, Original word,
+     * User's verb, and Output language. Then it parses the output and creates a
+     * StoreLlmOutput object.
+     *
+     * @param game
+     * @param verb
+     * @return
+     */
     private StoreLlmOutput promptLlm(GameState game, String verb) {
         StringBuilder prompt = new StringBuilder(initialPrompt);
         List<String> usedWords = game.getUsedWords();
