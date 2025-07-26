@@ -73,7 +73,7 @@ async function startNewGame() {
         }
         
         // Get new game from server
-        currentGame = await VerbsAPI.newGame();
+        currentGame = await VerbsAPI.newGame('en');
         
         // Reset UI
         resetGameUI();

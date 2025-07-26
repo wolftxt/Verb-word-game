@@ -27,7 +27,7 @@ public class VerbsService {
         this.repository = repository;
         this.geminiClient = geminiClient;
         this.parser = parser;
-        Scanner sc = new Scanner(VerbsService.class.getResourceAsStream("/static/prompt.txt"));
+        Scanner sc = new Scanner(VerbsService.class.getResourceAsStream("/prompt.txt"));
         sc.useDelimiter("\\A");
         initialPrompt = sc.next();
     }

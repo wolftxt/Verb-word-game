@@ -21,7 +21,7 @@ public class VerbsController {
         return ResponseEntity.ok(service.getLanguageList());
     }
 
-    @GetMapping("/newGame")
+    @GetMapping("/newGame/{language}")
     public ResponseEntity<GameState> getNewGame(@PathVariable String language) {
         GameState game = service.newGame(language);
         return game == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(game);
