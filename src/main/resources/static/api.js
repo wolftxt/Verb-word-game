@@ -3,27 +3,49 @@ const API_BASE_URL = '/api/verbs';
 
 // API Service
 const VerbsAPI = {
-    // Start a new game
-    async newGame(language) {
+    // Get supported languages
+    async getSupportedLanguages() {
         try {
-            const response = await fetch(`${API_BASE_URL}/newGame/${languagej}`, {
+            const response = await fetch(`${API_BASE_URL}/supportedLanguages`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
-
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch supported languages');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching languages:', error);
+            // Return default languages if API fails
+            return ['en', 'de', 'cz'];
+        }
+    },
+    
+    // Start a new game
+    async newGame(language = 'en') {
+        try {
+            const response = await fetch(`${API_BASE_URL}/newGame/${language}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
             if (!response.ok) {
                 throw new Error('Failed to start new game');
             }
-
+            
             return await response.json();
         } catch (error) {
             console.error('Error starting new game:', error);
             throw error;
         }
     },
-
+    
     // Submit a verb guess
     async guessVerb(gameId, guess) {
         try {
@@ -37,35 +59,35 @@ const VerbsAPI = {
                     guess: guess
                 })
             });
-
+            
             if (response.status === 400) {
                 const errorText = await response.text();
                 throw new Error(errorText || 'Invalid verb or verb already used');
             }
-
+            
             if (!response.ok) {
                 throw new Error('Failed to submit guess');
             }
-
+            
             return await response.json();
         } catch (error) {
             console.error('Error submitting guess:', error);
             throw error;
         }
     },
-
+    
     // Delete a game
     async deleteGame(gameId) {
         try {
             const response = await fetch(`${API_BASE_URL}/${gameId}`, {
                 method: 'DELETE'
             });
-
+            
             if (response.status === 404) {
                 console.warn('Game not found for deletion');
                 return false;
             }
-
+            
             return response.status === 204;
         } catch (error) {
             console.error('Error deleting game:', error);

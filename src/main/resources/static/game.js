@@ -1,6 +1,8 @@
 // Game State
 let currentGame = null;
 let isProcessing = false;
+let currentLanguage = 'en';
+let supportedLanguages = ['en', 'de', 'cz'];
 
 // DOM Elements
 const elements = {
@@ -19,11 +21,28 @@ const elements = {
     finalScore: document.getElementById('final-score'),
     gameOverMessage: document.getElementById('game-over-message'),
     newGameBtn: document.getElementById('new-game-btn'),
-    loading: document.getElementById('loading')
+    loading: document.getElementById('loading'),
+    currentLanguage: document.getElementById('current-language'),
+    currentFlag: document.getElementById('current-flag'),
+    languageDropdown: document.getElementById('language-dropdown')
 };
 
 // Initialize the game
-function init() {
+async function init() {
+    // Load current language
+    currentLanguage = TranslationUtils.getCurrentLanguage();
+    
+    // Update UI translations
+    TranslationUtils.updateUITranslations();
+    
+    // Fetch supported languages
+    try {
+        supportedLanguages = await VerbsAPI.getSupportedLanguages();
+        updateLanguageDropdown();
+    } catch (error) {
+        console.error('Failed to fetch supported languages:', error);
+    }
+    
     // Check if first time user
     const hasPlayedBefore = localStorage.getItem('hasPlayedVerbsGame');
     
@@ -60,6 +79,73 @@ function setupEventListeners() {
     });
     
     elements.newGameBtn.addEventListener('click', startNewGame);
+    
+    // Language switcher events
+    elements.currentLanguage.addEventListener('click', toggleLanguageDropdown);
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.language-switcher')) {
+            elements.languageDropdown.classList.add('hidden');
+        }
+    });
+}
+
+// Toggle language dropdown
+function toggleLanguageDropdown(e) {
+    e.stopPropagation();
+    elements.languageDropdown.classList.toggle('hidden');
+}
+
+// Update language dropdown with supported languages
+function updateLanguageDropdown() {
+    elements.languageDropdown.innerHTML = '';
+    
+    supportedLanguages.forEach(lang => {
+        const button = document.createElement('button');
+        button.className = 'language-option';
+        button.dataset.lang = lang;
+        
+        const flag = document.createElement('img');
+        flag.src = TranslationUtils.languageConfig[lang].flag;
+        flag.alt = TranslationUtils.languageConfig[lang].name;
+        flag.className = 'flag-icon';
+        
+        const name = document.createElement('span');
+        name.textContent = TranslationUtils.languageConfig[lang].name;
+        
+        button.appendChild(flag);
+        button.appendChild(name);
+        
+        button.addEventListener('click', () => changeLanguage(lang));
+        
+        elements.languageDropdown.appendChild(button);
+    });
+}
+
+// Change language
+async function changeLanguage(lang) {
+    if (lang === currentLanguage) {
+        elements.languageDropdown.classList.add('hidden');
+        return;
+    }
+    
+    currentLanguage = lang;
+    TranslationUtils.setCurrentLanguage(lang);
+    TranslationUtils.updateUITranslations();
+    
+    // Update current flag
+    elements.currentFlag.src = TranslationUtils.languageConfig[lang].flag;
+    elements.currentFlag.alt = TranslationUtils.languageConfig[lang].name;
+    
+    // Hide dropdown
+    elements.languageDropdown.classList.add('hidden');
+    
+    // Reset title animation for new language
+    AnimationUtils.resetTitleAnimation();
+    
+    // Start new game with new language
+    await startNewGame();
 }
 
 // Start a new game
@@ -72,8 +158,8 @@ async function startNewGame() {
             await VerbsAPI.deleteGame(currentGame.gameId);
         }
         
-        // Get new game from server
-        currentGame = await VerbsAPI.newGame('en');
+        // Get new game from server with current language
+        currentGame = await VerbsAPI.newGame(currentLanguage);
         
         // Reset UI
         resetGameUI();
@@ -88,7 +174,7 @@ async function startNewGame() {
         showLoading(false);
     } catch (error) {
         showLoading(false);
-        alert('Failed to start new game. Please try again.');
+        alert(TranslationUtils.t('errors.newGameFailed'));
         console.error(error);
     }
 }
@@ -138,13 +224,13 @@ async function submitVerb() {
     }
     
     if (verb.length > 50) {
-        alert('Verb is too long! Please keep it under 50 characters.');
+        alert(TranslationUtils.t('errors.tooLong'));
         return;
     }
     
     // Check if verb was already used
     if (currentGame.usedVerbs.includes(verb.replace(' ', '_'))) {
-        alert('This verb has already been used! Try another one.');
+        alert(TranslationUtils.t('errors.alreadyUsed'));
         AnimationUtils.shakeElement(elements.verbInput);
         return;
     }
@@ -180,9 +266,9 @@ async function submitVerb() {
         console.error('Error submitting verb:', error);
         
         if (error.message.includes('already')) {
-            alert('This verb has already been used! Try another one.');
+            alert(TranslationUtils.t('errors.alreadyUsed'));
         } else {
-            alert('Failed to submit verb. Please try again.');
+            alert(TranslationUtils.t('errors.submitFailed'));
         }
         
         AnimationUtils.shakeElement(elements.verbInput);
@@ -205,14 +291,19 @@ function showGameOver() {
     
     // Create game over message
     let message = '';
-    if (currentGame.score === 0) {
-        message = "Better luck next time! The chain broke on the first word.";
-    } else if (currentGame.score < 5) {
-        message = `Not bad! You kept the chain going for ${currentGame.score} ${currentGame.score === 1 ? 'round' : 'rounds'}.`;
-    } else if (currentGame.score < 10) {
-        message = `Great job! You maintained the chain for ${currentGame.score} rounds!`;
+    const score = currentGame.score;
+    
+    if (score === 0) {
+        message = TranslationUtils.t('gameOverMessages.zero');
+    } else if (score < 5) {
+        message = TranslationUtils.formatMessage('gameOverMessages.low', {
+            score: score,
+            rounds: TranslationUtils.getPluralRounds(score)
+        });
+    } else if (score < 10) {
+        message = TranslationUtils.formatMessage('gameOverMessages.medium', { score });
     } else {
-        message = `Amazing! You're a verb master with ${currentGame.score} successful rounds!`;
+        message = TranslationUtils.formatMessage('gameOverMessages.high', { score });
     }
     
     elements.gameOverMessage.textContent = message;

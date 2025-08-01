@@ -1,5 +1,10 @@
-// Title Animation Words
-const titleWords = ['fish', 'bear', 'bird', 'tree', 'cloud', 'star', 'moon'];
+// Title Animation Words per language
+const titleWordsByLanguage = {
+    en: ['fish', 'bear', 'bird', 'tree', 'cloud', 'star', 'moon'],
+    de: ['Fisch', 'Bär', 'Vogel', 'Baum', 'Wolke', 'Stern', 'Mond'],
+    cz: ['ryba', 'medvěd', 'pták', 'strom', 'mrak', 'hvězda', 'měsíc']
+};
+
 let currentWordIndex = 0;
 let isDeleting = false;
 let titleText = '';
@@ -8,6 +13,8 @@ let charIndex = 0;
 // Title animation function
 function animateTitle() {
     const titleWordElement = document.getElementById('title-word');
+    const lang = TranslationUtils.getCurrentLanguage();
+    const titleWords = titleWordsByLanguage[lang] || titleWordsByLanguage.en;
     const currentWord = titleWords[currentWordIndex];
     
     if (isDeleting) {
@@ -37,7 +44,8 @@ function animateTitle() {
 // Tutorial animation
 function animateTutorial() {
     const tutorialVerb = document.querySelector('.tutorial-verb');
-    const verb = 'jumps';
+    const verb = TranslationUtils.t('tutorialVerb');
+    tutorialVerb.textContent = '';
     let i = 0;
     
     const typeVerb = () => {
@@ -70,8 +78,8 @@ function showResponse(promptCount, llmOutput) {
     const llmResponseElement = document.getElementById('llm-response');
     
     // Format prompt count message
-    const ordinal = getOrdinal(promptCount);
-    promptCountElement.textContent = `You are the ${ordinal} person to say that!`;
+    const ordinal = TranslationUtils.getOrdinal(promptCount);
+    promptCountElement.textContent = TranslationUtils.formatMessage('promptCountMessage', { ordinal });
     
     // Show LLM response
     llmResponseElement.textContent = llmOutput;
@@ -117,5 +125,11 @@ window.AnimationUtils = {
     animateTutorial,
     addToUsedList,
     showResponse,
-    shakeElement
-};
+    shakeElement,
+    resetTitleAnimation: () => {
+        currentWordIndex = 0;
+        isDeleting = false;
+        titleText = '';
+        charIndex = 0;
+    }
+}; 

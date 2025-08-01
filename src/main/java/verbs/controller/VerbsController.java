@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import verbs.service.VerbsService;
 
 /**
- * Defines the api endpoints
+ * Defines the API endpoints
  *
  * @author davidwolf
  */

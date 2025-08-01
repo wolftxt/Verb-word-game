@@ -10,18 +10,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <button id="current-language" class="language-button">
+            <img id="current-flag" src="" alt="Language" class="flag-icon">
+            <span class="dropdown-arrow">▼</span>
+        </button>
+        <div id="language-dropdown" class="language-dropdown hidden">
+            <button class="language-option" data-lang="en">
+                <img src="https://flagcdn.com/24x18/gb.png" alt="English" class="flag-icon">
+                <span>English</span>
+            </button>
+            <button class="language-option" data-lang="de">
+                <img src="https://flagcdn.com/24x18/de.png" alt="Deutsch" class="flag-icon">
+                <span>Deutsch</span>
+            </button>
+            <button class="language-option" data-lang="cz">
+                <img src="https://flagcdn.com/24x18/cz.png" alt="Čeština" class="flag-icon">
+                <span>Čeština</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Tutorial Overlay -->
     <div id="tutorial-overlay" class="tutorial-overlay">
         <div class="tutorial-content">
-            <h2>Welcome to "What does a ___ do?"</h2>
+            <h2 id="tutorial-title">Welcome to "What does a ___ do?"</h2>
             <div class="tutorial-animation">
-                <div class="tutorial-word">Rabbit</div>
+                <div class="tutorial-word" id="tutorial-word">Rabbit</div>
                 <div class="tutorial-arrow">→</div>
                 <div class="tutorial-verb"></div>
             </div>
-            <p>Think of a verb that describes what the given noun does!</p>
-            <p>The AI will respond with a creative story and give you a new word.</p>
-            <p>Try to keep the chain going as long as possible!</p>
+            <p id="tutorial-text-1">Think of a verb that describes what the given noun does!</p>
+            <p id="tutorial-text-2">The AI will respond with a creative story and give you a new word.</p>
+            <p id="tutorial-text-3">Try to keep the chain going as long as possible!</p>
             <button id="start-game-btn" class="start-btn">Start Playing</button>
         </div>
     </div>
@@ -61,17 +83,17 @@
 
             <!-- Score Display -->
             <div class="score-display">
-                Score: <span id="score">0</span>
+                <span id="score-label">Score</span>: <span id="score">0</span>
             </div>
 
             <!-- Used Words/Verbs Display -->
             <div class="used-items-container">
                 <div class="used-section">
-                    <h3>Used Words</h3>
+                    <h3 id="used-words-title">Used Words</h3>
                     <div id="used-words" class="used-list"></div>
                 </div>
                 <div class="used-section">
-                    <h3>Used Verbs</h3>
+                    <h3 id="used-verbs-title">Used Verbs</h3>
                     <div id="used-verbs" class="used-list"></div>
                 </div>
             </div>
@@ -79,8 +101,8 @@
 
         <!-- Game Over Screen -->
         <div id="game-over" class="game-over hidden">
-            <h2>Game Over!</h2>
-            <p>Final Score: <span id="final-score">0</span></p>
+            <h2 id="game-over-title">Game Over!</h2>
+            <p><span id="final-score-label">Final Score</span>: <span id="final-score">0</span></p>
             <div id="game-over-message"></div>
             <button id="new-game-btn" class="new-game-btn">New Game</button>
         </div>
@@ -92,6 +114,7 @@
     </div>
 
     <script src="api.js"></script>
+    <script src="translations.js"></script>
     <script src="animations.js"></script>
     <script src="game.js"></script>
 </body>

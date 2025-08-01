@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Used to cache llm responses and count how many times this exact word verb
+ * Used to cache LLM responses and count how many times this exact word verb
  * combination has been used.
  *
  * @author davidwolf
