@@ -2,6 +2,7 @@ package verbs.service;
 
 import com.google.genai.Client;
 import com.google.genai.types.Content;
+import com.google.genai.types.GenerateContentConfig;
 import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.HttpOptions;
 import com.google.genai.types.Part;
@@ -25,7 +26,7 @@ public class GeminiApiClient {
     @PostConstruct
     public void init() {
         geminiClient = Client.builder().apiKey(apiKey)
-                .httpOptions(HttpOptions.builder().apiVersion("v1beta").build())
+                .httpOptions(HttpOptions.builder().apiVersion("v1").build())
                 .build();
     }
 

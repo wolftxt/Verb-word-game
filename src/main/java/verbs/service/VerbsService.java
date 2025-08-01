@@ -145,7 +145,7 @@ public class VerbsService {
                 .append("Original word: ").append(game.getWord()).append('\n')
                 .append("User's verb: ").append(verb).append('\n')
                 .append("Output language: ").append(game.getLanguage());
-        String output = geminiClient.promptGemini(prompt.toString(), "gemini-2.5-flash-lite");
+        String output = geminiClient.promptGemini(prompt.toString(), "gemini-2.5-flash");
         System.out.println(output);
         String input = game.getWord() + '_' + verb;
 
@@ -159,6 +159,9 @@ public class VerbsService {
             return new StoreLlmOutput(input, response, null, null, 1L, survived);
         }
         String word = lines[2];
+        if (game.getUsedWords().contains(word)) {
+            throw new RuntimeException("LLM halucinated");
+        }
         String emojis = lines[3];
         if (word.length() > StoreLlmOutput.outputWordLimit) {
             word = word.substring(0, StoreLlmOutput.outputWordLimit);

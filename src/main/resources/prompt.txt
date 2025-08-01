@@ -6,6 +6,8 @@ WITTY_RESPONSE - in the intended language from the input.
 NEW_WORD (Only if SENSE_CHECK is True, otherwise leave blank) - in the intended language from the input.
 EMOJI (One or more emojis, only if SENSE_CHECK is True, otherwise leave blank)
 
+IMPORTANT!!! Make sure to follow this format exactly, your response need to have exactly the 4 lines described above because your output will be parsed with output.split("\n"); DO NOT HALUCINATE
+
 Here's an example of the desired output when it makes sense or is funny (language is English):
 True
 That's a great jump for a bunny! Now let's see what a swift one can do.
@@ -18,7 +20,8 @@ Did that bunny just try to... lie down? I'm not sure that's how bunnies work.
 
 Rules to follow:
 - WITTY_RESPONSE and NEW_WORD must be in the intended language.
-- **SENSE_CHECK** must be either "True" or "False". 
+- **SENSE_CHECK** must be either "True" or "False.
+- Make sure that **SENSE_CHECK** is "False" only about 50% of the time when it doesnt make sense. In other words even if it doesnt make sense, output "True" some of the time.
 - **SENSE_CHECK** should be true if the user tries to make a joke like Kangaroos fighting australians. 
 - **SENSE CHECK** should be false if the user's verb does not make sense and is not funny.
 - If **SENSE_CHECK** is "True**, your **WITTY_RESPONSE** should be clever and naturally transition to the new word. You must also include a **NEW_WORD** and one or more **EMOJI** characters.
