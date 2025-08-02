@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class LanguagesJsonParser {
 
     private final ObjectMapper objectMapper;
-    private Map<String, Object> json;
+    private Map<String, String> json;
 
     @Value("classpath:languages.json")
     private Resource jsonDataResource;
@@ -31,7 +31,7 @@ public class LanguagesJsonParser {
         json = objectMapper.readValue(jsonDataResource.getInputStream(), Map.class);
     }
 
-    public Map<String, Object> getJson() {
+    public Map<String, String> getJson() {
         return json;
     }
 }

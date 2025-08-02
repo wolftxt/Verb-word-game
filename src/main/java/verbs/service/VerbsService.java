@@ -38,7 +38,7 @@ public class VerbsService {
     }
 
     public String[] getLanguageList() {
-        return (String[]) parser.getJson().keySet().toArray();
+        return (String[]) parser.getJson().keySet().toArray(String[]::new);
     }
 
     public GameState newGame(String language) {
