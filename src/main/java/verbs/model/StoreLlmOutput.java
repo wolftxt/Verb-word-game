@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StoreLlmOutput {
 
-    public static final int inputLimit = 256;
+    public static final int inputLimit = 512;
     public static final int outputWordLimit = 64;
     public static final int outputLimit = 1024;
 
