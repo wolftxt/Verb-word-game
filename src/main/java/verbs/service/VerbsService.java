@@ -134,42 +134,46 @@ public class VerbsService {
      * @return
      */
     private StoreLlmOutput promptLlm(GameState game, String verb) {
-        StringBuilder prompt = new StringBuilder(initialPrompt);
-        List<String> usedWords = game.getUsedWords();
-        for (int i = 0; i < usedWords.size() - 1; i++) {
-            prompt.append(usedWords.get(i));
-            prompt.append(", ");
-        }
-        prompt.append(usedWords.getLast()).append('\n')
-                .append("Input:").append('\n')
-                .append("Original word: ").append(game.getWord()).append('\n')
-                .append("User's verb: ").append(verb).append('\n')
-                .append("Output language: ").append(game.getLanguage());
-        String output = geminiClient.promptGemini(prompt.toString(), "gemini-2.5-flash");
-        System.out.println(output);
         String input = game.getWord() + '_' + verb;
+        try {
+            StringBuilder prompt = new StringBuilder(initialPrompt);
+            List<String> usedWords = game.getUsedWords();
+            for (int i = 0; i < usedWords.size() - 1; i++) {
+                prompt.append(usedWords.get(i));
+                prompt.append(", ");
+            }
+            prompt.append(usedWords.getLast()).append('\n')
+                    .append("Input:").append('\n')
+                    .append("Original word: ").append(game.getWord()).append('\n')
+                    .append("User's verb: ").append(verb).append('\n')
+                    .append("Output language: ").append(game.getLanguage());
+            String output = geminiClient.promptGemini(prompt.toString(), "gemini-2.5-flash");
+            System.out.println(output);
 
-        String[] lines = output.split("\\n+");
-        Boolean survived = Boolean.valueOf(lines[0]);
-        String response = lines[1];
-        if (response.length() > StoreLlmOutput.outputLimit) {
-            response = response.substring(0, StoreLlmOutput.outputLimit);
+            String[] lines = output.split("\\n+");
+            Boolean survived = Boolean.valueOf(lines[0]);
+            String response = lines[1];
+            if (response.length() > StoreLlmOutput.outputLimit) {
+                response = response.substring(0, StoreLlmOutput.outputLimit);
+            }
+            if (!survived) {
+                return new StoreLlmOutput(input, response, null, null, 1L, survived);
+            }
+            String word = lines[2];
+            if (game.getUsedWords().contains(word)) {
+                throw new RuntimeException("LLM halucinated");
+            }
+            String emojis = lines[3];
+            if (word.length() > StoreLlmOutput.outputWordLimit) {
+                word = word.substring(0, StoreLlmOutput.outputWordLimit);
+            }
+            if (emojis.length() > StoreLlmOutput.outputWordLimit) {
+                emojis = word.substring(0, StoreLlmOutput.outputWordLimit);
+            }
+            return new StoreLlmOutput(input, response, word, emojis, 1L, survived);
+        } catch (Exception e) {
+            return new StoreLlmOutput(input, "Congratulations, you have beaten the AI!", null, null, 1L, false);
         }
-        if (!survived) {
-            return new StoreLlmOutput(input, response, null, null, 1L, survived);
-        }
-        String word = lines[2];
-        if (game.getUsedWords().contains(word)) {
-            throw new RuntimeException("LLM halucinated");
-        }
-        String emojis = lines[3];
-        if (word.length() > StoreLlmOutput.outputWordLimit) {
-            word = word.substring(0, StoreLlmOutput.outputWordLimit);
-        }
-        if (emojis.length() > StoreLlmOutput.outputWordLimit) {
-            emojis = word.substring(0, StoreLlmOutput.outputWordLimit);
-        }
-        return new StoreLlmOutput(input, response, word, emojis, 1L, survived);
     }
 
 }
