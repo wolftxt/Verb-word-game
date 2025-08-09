@@ -2,6 +2,7 @@ package verbs.service;
 
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import verbs.controller.GameNotFoundException;
 import verbs.controller.GameState;
@@ -23,27 +24,28 @@ public class VerbsService {
 
     private final LlmOutputRepository repository;
     private final GeminiApiClient geminiClient;
-    private final LanguagesJsonParser parser;
+    private final MessageSource messageSource;
 
     private final Map<String, GameState> games = new HashMap();
 
     @Autowired
-    public VerbsService(LlmOutputRepository repository, GeminiApiClient geminiClient, LanguagesJsonParser parser) {
+    public VerbsService(LlmOutputRepository repository, GeminiApiClient geminiClient, MessageSource messageSource) {
         this.repository = repository;
         this.geminiClient = geminiClient;
-        this.parser = parser;
+        this.messageSource = messageSource;
         Scanner sc = new Scanner(VerbsService.class.getResourceAsStream("/prompt.txt"));
         sc.useDelimiter("\\A");
         initialPrompt = sc.next();
     }
 
     public String[] getLanguageList() {
-        return (String[]) parser.getJson().keySet().toArray(String[]::new);
+        return new String[]{"en", "de", "cz"};
     }
 
     public GameState newGame(String language) {
         String gameId = UUID.randomUUID().toString();
-        String initialWord = (String) parser.getJson().get(language);
+        Locale locale = Locale.of(language);
+        String initialWord = messageSource.getMessage("rabbit", null, locale);
         if (initialWord == null) {
             throw new IllegalArgumentException("Language: " + language + " is not supported");
         }
@@ -172,7 +174,9 @@ public class VerbsService {
             }
             return new StoreLlmOutput(input, response, word, emojis, 1L, survived);
         } catch (Exception e) {
-            return new StoreLlmOutput(input, "Congratulations, you have beaten the AI!", null, null, 1L, false);
+            Locale locale = Locale.of(game.getLanguage());
+            String message = messageSource.getMessage("victory", null, locale);
+            return new StoreLlmOutput(input, message, null, null, 1L, false);
         }
     }
 
