@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #66ea81 0%, #5759e4 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -142,7 +142,7 @@ body {
 }
 
 .tutorial-word {
-    color: #667eea;
+    color: #696ae9;
 }
 
 .tutorial-arrow {
@@ -151,7 +151,7 @@ body {
 }
 
 .tutorial-verb {
-    color: #764ba2;
+    color: #66ea81;
     min-width: 80px;
     text-align: left;
 }
@@ -168,7 +168,7 @@ body {
 }
 
 .start-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #66ea81 0%, #5759e4 100%);
     color: white;
     border: none;
     padding: 15px 40px;
@@ -181,7 +181,7 @@ body {
 
 .start-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 10px 30px rgba(102, 234, 129, 0.4);
 }
 
 /* Animated Title */
@@ -198,18 +198,25 @@ body {
     color: #ffd700;
     position: relative;
     display: inline-block;
+    min-width: 20px;
+    min-height: 1em;
+    margin-right: 8px;
 }
 
 .title-word::after {
     content: '|';
     position: absolute;
-    right: -12px;
+    right: -18px;
     animation: blink 1s infinite;
 }
 
 @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
 }
 
 /* Game Area */
@@ -238,14 +245,18 @@ body {
 }
 
 @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
 .word-display {
     font-size: 36px;
     font-weight: 700;
-    color: #667eea;
+    color: #696ae9;
 }
 
 /* Input Section */
@@ -269,11 +280,11 @@ body {
 
 .verb-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #696ae9;
 }
 
 .submit-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #66ea81 0%, #5759e4 100%);
     color: white;
     border: none;
     padding: 15px 30px;
@@ -286,7 +297,7 @@ body {
 
 .submit-btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 10px 30px rgba(102, 234, 129, 0.4);
 }
 
 .submit-btn:disabled {
@@ -338,7 +349,7 @@ body {
     text-align: center;
     font-size: 24px;
     font-weight: 600;
-    color: #667eea;
+    color: #696ae9;
     margin-bottom: 30px;
 }
 
@@ -369,7 +380,7 @@ body {
 }
 
 .used-item {
-    background: #667eea;
+    background: #696ae9;
     color: white;
     padding: 5px 12px;
     border-radius: 20px;
@@ -404,7 +415,7 @@ body {
 
 .game-over h2 {
     font-size: 36px;
-    color: #667eea;
+    color: #696ae9;
     margin-bottom: 20px;
 }
 
@@ -420,7 +431,7 @@ body {
 }
 
 .new-game-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #66ea81 0%, #5759e4 100%);
     color: white;
     border: none;
     padding: 15px 40px;
@@ -432,7 +443,7 @@ body {
 
 .new-game-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 10px 30px rgba(102, 234, 129, 0.4);
 }
 
 /* Loading Spinner */
@@ -458,7 +469,9 @@ body {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Animations */
@@ -501,64 +514,64 @@ body {
         width: 95%;
         padding: 10px;
     }
-    
+
     .language-switcher {
         top: 10px;
         right: 10px;
     }
-    
+
     .animated-title {
         font-size: 28px;
         margin-bottom: 30px;
     }
-    
+
     .word-display {
         font-size: 24px;
     }
-    
+
     .emoji-display {
         font-size: 60px;
     }
-    
+
     .game-area {
         padding: 20px;
     }
-    
+
     .game-over {
         padding: 20px;
     }
-    
+
     .used-items-container {
         grid-template-columns: 1fr;
         gap: 15px;
     }
-    
+
     .tutorial-content {
         padding: 20px;
         margin: 20px;
         max-width: calc(100vw - 40px);
     }
-    
+
     .tutorial-animation {
         font-size: 20px;
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .tutorial-arrow {
         transform: rotate(90deg);
         margin: 5px 0;
     }
-    
+
     .input-section {
         flex-direction: column;
         gap: 15px;
     }
-    
+
     .submit-btn {
         width: 100%;
     }
-    
+
     .verb-input {
         width: 100%;
     }
@@ -568,23 +581,23 @@ body {
     .animated-title {
         font-size: 24px;
     }
-    
+
     .word-display {
         font-size: 20px;
     }
-    
+
     .emoji-display {
         font-size: 50px;
     }
-    
+
     .tutorial-content {
         padding: 15px;
     }
-    
+
     .game-area {
         padding: 15px;
     }
-    
+
     .game-over {
         padding: 15px;
     }

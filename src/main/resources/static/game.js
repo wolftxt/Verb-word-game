@@ -32,10 +32,16 @@ const elements = {
 async function init() {
     // Load current language
     currentLanguage = TranslationUtils.getCurrentLanguage();
-    
+
     // Update UI translations
     TranslationUtils.updateUITranslations();
-    
+
+    // Update tutorial verb text immediately after translations are loaded
+    const tutorialVerbElement = document.querySelector('.tutorial-verb');
+    if (tutorialVerbElement) {
+        tutorialVerbElement.textContent = TranslationUtils.t('tutorialVerb');
+    }
+
     // Fetch supported languages
     try {
         supportedLanguages = await VerbsAPI.getSupportedLanguages();
@@ -43,10 +49,10 @@ async function init() {
     } catch (error) {
         console.error('Failed to fetch supported languages:', error);
     }
-    
+
     // Check if first time user
     const hasPlayedBefore = localStorage.getItem('hasPlayedVerbsGame');
-    
+
     if (!hasPlayedBefore) {
         // Show tutorial
         elements.tutorialOverlay.classList.remove('hidden');
@@ -56,10 +62,10 @@ async function init() {
         elements.tutorialOverlay.classList.add('hidden');
         startNewGame();
     }
-    
+
     // Start title animation
     AnimationUtils.animateTitle();
-    
+
     // Set up event listeners
     setupEventListeners();
 }
@@ -71,19 +77,19 @@ function setupEventListeners() {
         elements.tutorialOverlay.classList.add('hidden');
         startNewGame();
     });
-    
+
     elements.submitBtn.addEventListener('click', submitVerb);
     elements.verbInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !isProcessing) {
             submitVerb();
         }
     });
-    
+
     elements.newGameBtn.addEventListener('click', startNewGame);
-    
+
     // Language switcher events
     elements.currentLanguage.addEventListener('click', toggleLanguageDropdown);
-    
+
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.language-switcher')) {
@@ -101,25 +107,25 @@ function toggleLanguageDropdown(e) {
 // Update language dropdown with supported languages
 function updateLanguageDropdown() {
     elements.languageDropdown.innerHTML = '';
-    
+
     supportedLanguages.forEach(lang => {
         const button = document.createElement('button');
         button.className = 'language-option';
         button.dataset.lang = lang;
-        
+
         const flag = document.createElement('img');
         flag.src = TranslationUtils.languageConfig[lang].flag;
         flag.alt = TranslationUtils.languageConfig[lang].name;
         flag.className = 'flag-icon';
-        
+
         const name = document.createElement('span');
         name.textContent = TranslationUtils.languageConfig[lang].name;
-        
+
         button.appendChild(flag);
         button.appendChild(name);
-        
+
         button.addEventListener('click', () => changeLanguage(lang));
-        
+
         elements.languageDropdown.appendChild(button);
     });
 }
@@ -130,21 +136,27 @@ async function changeLanguage(lang) {
         elements.languageDropdown.classList.add('hidden');
         return;
     }
-    
+
     currentLanguage = lang;
     TranslationUtils.setCurrentLanguage(lang);
     TranslationUtils.updateUITranslations();
-    
+
+    // Update tutorial verb text for new language
+    const tutorialVerbElement = document.querySelector('.tutorial-verb');
+    if (tutorialVerbElement) {
+        tutorialVerbElement.textContent = TranslationUtils.t('tutorialVerb');
+    }
+
     // Update current flag
     elements.currentFlag.src = TranslationUtils.languageConfig[lang].flag;
     elements.currentFlag.alt = TranslationUtils.languageConfig[lang].name;
-    
+
     // Hide dropdown
     elements.languageDropdown.classList.add('hidden');
-    
+
     // Reset title animation for new language
     AnimationUtils.resetTitleAnimation();
-    
+
     // Start new game with new language
     await startNewGame();
 }
@@ -153,25 +165,25 @@ async function changeLanguage(lang) {
 async function startNewGame() {
     try {
         showLoading(true);
-        
+
         // Delete previous game if exists
         if (currentGame && currentGame.gameId) {
             await VerbsAPI.deleteGame(currentGame.gameId);
         }
-        
+
         // Get new game from server with current language
         currentGame = await VerbsAPI.newGame(currentLanguage);
-        
+
         // Reset UI
         resetGameUI();
-        
+
         // Show game area
         elements.gameArea.classList.remove('hidden');
         elements.gameOver.classList.add('hidden');
-        
+
         // Update display
         updateGameDisplay();
-        
+
         showLoading(false);
     } catch (error) {
         showLoading(false);
@@ -193,23 +205,24 @@ function resetGameUI() {
 
 // Update game display
 function updateGameDisplay() {
-    if (!currentGame) return;
-    
+    if (!currentGame)
+        return;
+
     // Update word and emoji
     elements.wordDisplay.textContent = currentGame.word;
     elements.emojiDisplay.textContent = currentGame.emojis || '❓';
-    
+
     // Update score
     elements.score.textContent = currentGame.score;
-    
+
     // Update used words and verbs
     elements.usedWords.innerHTML = '';
     elements.usedVerbs.innerHTML = '';
-    
+
     currentGame.usedWords.forEach(word => {
         AnimationUtils.addToUsedList(word, 'used-words');
     });
-    
+
     currentGame.usedVerbs.forEach(verb => {
         AnimationUtils.addToUsedList(verb, 'used-verbs');
     });
@@ -218,61 +231,61 @@ function updateGameDisplay() {
 // Submit a verb
 async function submitVerb() {
     const verb = elements.verbInput.value.trim().toLowerCase();
-    
+
     // Validation
     if (!verb) {
         AnimationUtils.shakeElement(elements.verbInput);
         return;
     }
-    
+
     if (verb.length > 256) {
         alert(TranslationUtils.t('errors.tooLong'));
         return;
     }
-    
+
     // Check if verb was already used
     if (currentGame.usedVerbs.includes(verb.replace(' ', '_'))) {
         alert(TranslationUtils.t('errors.alreadyUsed'));
         AnimationUtils.shakeElement(elements.verbInput);
         return;
     }
-    
+
     // Disable input during processing
     isProcessing = true;
     elements.submitBtn.disabled = true;
     elements.verbInput.disabled = true;
     showLoading(true);
-    
+
     try {
         // Submit guess to server
         const response = await VerbsAPI.guessVerb(currentGame.gameId, verb);
-        
+
         // Update game state
         currentGame = response;
-        
+
         // Show response
         AnimationUtils.showResponse(response.promptCount, response.llmOutput);
-        
+
         // Clear input
         elements.verbInput.value = '';
-        
+
         // Check if game is over
         if (!response.playing) {
-            setTimeout(() => showGameOver(response.promptCount, response.llmOutput), 2000);
+            showGameOver(response.promptCount, response.llmOutput);
         } else {
             // Update display for next round
             updateGameDisplay();
         }
-        
+
     } catch (error) {
         console.error('Error submitting verb:', error);
-        
+
         if (error.message.includes('already')) {
             alert(TranslationUtils.t('errors.alreadyUsed'));
         } else {
             alert(TranslationUtils.t('errors.submitFailed'));
         }
-        
+
         AnimationUtils.shakeElement(elements.verbInput);
     } finally {
         // Re-enable input
@@ -288,18 +301,18 @@ async function submitVerb() {
 function showGameOver(promptCount, llmOutput) {
     elements.gameArea.classList.add('hidden');
     elements.gameOver.classList.remove('hidden');
-    
+
     // Show final response before game over message
     if (promptCount && llmOutput) {
         AnimationUtils.showFinalResponse(promptCount, llmOutput);
     }
-    
+
     elements.finalScore.textContent = currentGame.score;
-    
+
     // Create game over message
     let message = '';
     const score = currentGame.score;
-    
+
     if (score === 0) {
         message = TranslationUtils.t('gameOverMessages.zero');
     } else if (score < 5) {
@@ -308,11 +321,11 @@ function showGameOver(promptCount, llmOutput) {
             rounds: TranslationUtils.getPluralRounds(score)
         });
     } else if (score < 10) {
-        message = TranslationUtils.formatMessage('gameOverMessages.medium', { score });
+        message = TranslationUtils.formatMessage('gameOverMessages.medium', {score});
     } else {
-        message = TranslationUtils.formatMessage('gameOverMessages.high', { score });
+        message = TranslationUtils.formatMessage('gameOverMessages.high', {score});
     }
-    
+
     elements.gameOverMessage.textContent = message;
 }
 
