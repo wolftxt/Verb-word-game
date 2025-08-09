@@ -20,6 +20,7 @@ const elements = {
     gameOver: document.getElementById('game-over'),
     finalScore: document.getElementById('final-score'),
     gameOverMessage: document.getElementById('game-over-message'),
+    finalResponseSection: document.getElementById('final-response-section'),
     newGameBtn: document.getElementById('new-game-btn'),
     loading: document.getElementById('loading'),
     currentLanguage: document.getElementById('current-language'),
@@ -183,6 +184,7 @@ async function startNewGame() {
 function resetGameUI() {
     elements.verbInput.value = '';
     elements.responseSection.classList.add('hidden');
+    elements.finalResponseSection.classList.add('hidden');
     elements.usedWords.innerHTML = '';
     elements.usedVerbs.innerHTML = '';
     elements.score.textContent = '0';
@@ -223,7 +225,7 @@ async function submitVerb() {
         return;
     }
     
-    if (verb.length > 50) {
+    if (verb.length > 256) {
         alert(TranslationUtils.t('errors.tooLong'));
         return;
     }
@@ -256,7 +258,7 @@ async function submitVerb() {
         
         // Check if game is over
         if (!response.playing) {
-            setTimeout(() => showGameOver(), 2000);
+            setTimeout(() => showGameOver(response.promptCount, response.llmOutput), 2000);
         } else {
             // Update display for next round
             updateGameDisplay();
@@ -283,9 +285,14 @@ async function submitVerb() {
 }
 
 // Show game over screen
-function showGameOver() {
+function showGameOver(promptCount, llmOutput) {
     elements.gameArea.classList.add('hidden');
     elements.gameOver.classList.remove('hidden');
+    
+    // Show final response before game over message
+    if (promptCount && llmOutput) {
+        AnimationUtils.showFinalResponse(promptCount, llmOutput);
+    }
     
     elements.finalScore.textContent = currentGame.score;
     

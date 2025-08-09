@@ -153,6 +153,7 @@ body {
 .tutorial-verb {
     color: #764ba2;
     min-width: 80px;
+    text-align: left;
 }
 
 .tutorial-content h2 {
@@ -196,12 +197,13 @@ body {
     font-family: 'Space Mono', monospace;
     color: #ffd700;
     position: relative;
+    display: inline-block;
 }
 
 .title-word::after {
     content: '|';
     position: absolute;
-    right: -10px;
+    right: -12px;
     animation: blink 1s infinite;
 }
 
@@ -261,6 +263,8 @@ body {
     border-radius: 10px;
     transition: border-color 0.3s;
     font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .verb-input:focus {
@@ -277,6 +281,7 @@ body {
     border-radius: 10px;
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
+    white-space: nowrap;
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -315,6 +320,19 @@ body {
     color: #444;
 }
 
+/* Final Response Section (for game over) */
+.final-response-section {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    animation: slideUp 0.5s ease-out;
+}
+
+.final-response-section.hidden {
+    display: none;
+}
+
 /* Score Display */
 .score-display {
     text-align: center;
@@ -342,6 +360,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    min-height: 50px; /* Ensure consistent height */
     max-height: 150px;
     overflow-y: auto;
     padding: 10px;
@@ -478,25 +497,96 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
+    
+    .language-switcher {
+        top: 10px;
+        right: 10px;
+    }
+    
     .animated-title {
-        font-size: 32px;
+        font-size: 28px;
+        margin-bottom: 30px;
     }
     
     .word-display {
-        font-size: 28px;
+        font-size: 24px;
     }
     
     .emoji-display {
         font-size: 60px;
     }
     
+    .game-area {
+        padding: 20px;
+    }
+    
+    .game-over {
+        padding: 20px;
+    }
+    
     .used-items-container {
         grid-template-columns: 1fr;
+        gap: 15px;
     }
     
     .tutorial-content {
-        padding: 30px;
+        padding: 20px;
         margin: 20px;
+        max-width: calc(100vw - 40px);
+    }
+    
+    .tutorial-animation {
+        font-size: 20px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .tutorial-arrow {
+        transform: rotate(90deg);
+        margin: 5px 0;
+    }
+    
+    .input-section {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .submit-btn {
+        width: 100%;
+    }
+    
+    .verb-input {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .animated-title {
+        font-size: 24px;
+    }
+    
+    .word-display {
+        font-size: 20px;
+    }
+    
+    .emoji-display {
+        font-size: 50px;
+    }
+    
+    .tutorial-content {
+        padding: 15px;
+    }
+    
+    .game-area {
+        padding: 15px;
+    }
+    
+    .game-over {
+        padding: 15px;
     }
 }
 

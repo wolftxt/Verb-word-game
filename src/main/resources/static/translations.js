@@ -17,7 +17,7 @@ const translations = {
         newGameButton: "New Game",
         loadingText: "Loading...",
         errors: {
-            tooLong: "Verb is too long! Please keep it under 50 characters.",
+            tooLong: "Verb is too long! Please keep it under 256 characters.",
             alreadyUsed: "This verb has already been used! Try another one.",
             submitFailed: "Failed to submit verb. Please try again.",
             newGameFailed: "Failed to start new game. Please try again."
@@ -33,8 +33,8 @@ const translations = {
         tutorialVerb: "jumps"
     },
     de: {
-        title: "Was macht ein/e ___ ?",
-        tutorialTitle: 'Willkommen bei "Was macht ein/e ___ ?"',
+        title: "Was macht ein/e ___?",
+        tutorialTitle: 'Willkommen bei "Was macht ein/e ___?"',
         tutorialText1: "Denke dir ein Verb aus, das beschreibt, was das Nomen tut!",
         tutorialText2: "Die KI antwortet mit einer kreativen Geschichte und gibt dir ein neues Wort.",
         tutorialText3: "Versuche, die Kette so lange wie möglich aufrechtzuerhalten!",
@@ -49,7 +49,7 @@ const translations = {
         newGameButton: "Neues Spiel",
         loadingText: "Lädt...",
         errors: {
-            tooLong: "Das Verb ist zu lang! Bitte maximal 50 Zeichen verwenden.",
+            tooLong: "Das Verb ist zu lang! Bitte maximal 256 Zeichen verwenden.",
             alreadyUsed: "Dieses Verb wurde bereits verwendet! Versuche ein anderes.",
             submitFailed: "Fehler beim Absenden. Bitte erneut versuchen.",
             newGameFailed: "Fehler beim Starten eines neuen Spiels. Bitte erneut versuchen."
@@ -81,7 +81,7 @@ const translations = {
         newGameButton: "Nová hra",
         loadingText: "Načítání...",
         errors: {
-            tooLong: "Sloveso je příliš dlouhé! Použijte maximálně 50 znaků.",
+            tooLong: "Sloveso je příliš dlouhé! Použijte maximálně 256 znaků.",
             alreadyUsed: "Toto sloveso již bylo použito! Zkuste jiné.",
             submitFailed: "Nepodařilo se odeslat sloveso. Zkuste to znovu.",
             newGameFailed: "Nepodařilo se začít novou hru. Zkuste to znovu."
@@ -97,11 +97,10 @@ const translations = {
         tutorialVerb: "skáče"
     }
 };
-
 // Language configuration
 const languageConfig = {
-    en: { 
-        flag: 'https://flagcdn.com/24x18/gb.png', 
+    en: {
+        flag: 'https://flagcdn.com/24x18/gb.png',
         name: 'English',
         ordinalSuffix: (n) => {
             const s = ['th', 'st', 'nd', 'rd'];
@@ -110,19 +109,21 @@ const languageConfig = {
         },
         pluralRounds: (n) => n === 1 ? 'round' : 'rounds'
     },
-    de: { 
-        flag: 'https://flagcdn.com/24x18/de.png', 
+    de: {
+        flag: 'https://flagcdn.com/24x18/de.png',
         name: 'Deutsch',
         ordinalSuffix: (n) => n + '.',
         pluralRounds: (n) => n === 1 ? 'Runde' : 'Runden'
     },
-    cz: { 
-        flag: 'https://flagcdn.com/24x18/cz.png', 
+    cz: {
+        flag: 'https://flagcdn.com/24x18/cz.png',
         name: 'Čeština',
         ordinalSuffix: (n) => n + '.',
         pluralRounds: (n) => {
-            if (n === 1) return 'kolo';
-            if (n >= 2 && n <= 4) return 'kola';
+            if (n === 1)
+                return 'kolo';
+            if (n >= 2 && n <= 4)
+                return 'kola';
             return 'kol';
         }
     }
@@ -143,23 +144,24 @@ function t(key) {
     const lang = getCurrentLanguage();
     const keys = key.split('.');
     let value = translations[lang];
-    
+
     for (const k of keys) {
         value = value[k];
-        if (!value) return key; // Return key if translation not found
+        if (!value)
+            return key; // Return key if translation not found
     }
-    
+
     return value;
 }
 
 // Get formatted message with placeholders
 function formatMessage(key, params = {}) {
     let message = t(key);
-    
+
     for (const [param, value] of Object.entries(params)) {
         message = message.replace(`{${param}}`, value);
     }
-    
+
     return message;
 }
 
@@ -178,7 +180,7 @@ function getPluralRounds(n) {
 // Update UI with translations
 function updateUITranslations() {
     const lang = getCurrentLanguage();
-    
+
     // Update all elements with translations
     document.getElementById('tutorial-title').textContent = t('tutorialTitle');
     document.getElementById('tutorial-text-1').textContent = t('tutorialText1');
@@ -193,10 +195,14 @@ function updateUITranslations() {
     document.getElementById('game-over-title').textContent = t('gameOverTitle');
     document.getElementById('final-score-label').textContent = t('finalScoreLabel');
     document.getElementById('new-game-btn').textContent = t('newGameButton');
-    
+
     // Update tutorial word
     document.getElementById('tutorial-word').textContent = t('tutorialWord');
-    
+
+    // Update the main title
+    const titleElement = document.getElementById('animated-title');
+    titleElement.innerHTML = t('title').replace('___', '<span id="title-word" class="title-word"></span>');
+
     // Update current language flag
     const currentFlag = document.getElementById('current-flag');
     currentFlag.src = languageConfig[lang].flag;

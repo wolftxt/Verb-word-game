@@ -51,7 +51,7 @@
     <!-- Main Game Container -->
     <div class="container">
         <!-- Animated Title -->
-        <h1 class="animated-title">
+        <h1 class="animated-title" id="animated-title">
             What does a <span id="title-word" class="title-word"></span> do?
         </h1>
 
@@ -70,7 +70,7 @@
                     id="verb-input" 
                     class="verb-input" 
                     placeholder="Enter a verb..."
-                    maxlength="50"
+                    maxlength="256"
                 >
                 <button id="submit-btn" class="submit-btn">Submit</button>
             </div>
@@ -101,6 +101,12 @@
 
         <!-- Game Over Screen -->
         <div id="game-over" class="game-over hidden">
+            <!-- Final Response Section (shown before game over message) -->
+            <div id="final-response-section" class="final-response-section hidden">
+                <div class="prompt-count" id="final-prompt-count"></div>
+                <div class="llm-response" id="final-llm-response"></div>
+            </div>
+            
             <h2 id="game-over-title">Game Over!</h2>
             <p><span id="final-score-label">Final Score</span>: <span id="final-score">0</span></p>
             <div id="game-over-message"></div>
