@@ -33,8 +33,8 @@ const translations = {
         tutorialVerb: "jumps"
     },
     de: {
-        title: "Was macht ein/e ___?",
-        tutorialTitle: 'Willkommen bei "Was macht ein/e ___?"',
+        title: "Was macht ein ___?",
+        tutorialTitle: 'Willkommen bei "Was macht ein ___?"',
         tutorialText1: "Denke dir ein Verb aus, das beschreibt, was das Nomen tut!",
         tutorialText2: "Die KI antwortet mit einer kreativen Geschichte und gibt dir ein neues Wort.",
         tutorialText3: "Versuche, die Kette so lange wie möglich aufrechtzuerhalten!",
@@ -61,7 +61,7 @@ const translations = {
             high: "Fantastisch! Du bist ein Verb-Meister mit {score} erfolgreichen Runden!"
         },
         promptCountMessage: "Du bist die {ordinal} Person, die das gesagt hat!",
-        tutorialWord: "Hase",
+        tutorialWord: "Kaninchen",
         tutorialVerb: "hüpft"
     },
     cz: {
